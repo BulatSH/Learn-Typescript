@@ -69,56 +69,109 @@
 //
 // console.log(printReport(totalData));
 
-enum TypesOfMedia {
-	VIDEO = 'video',
-	AUDIO = 'audio',
+// enum TypesOfMedia {
+// 	VIDEO = 'video',
+// 	AUDIO = 'audio',
+// }
+//
+// enum FormatsOfMedia {
+// 	MP4 = '.mp4',
+// 	MOV = '.mov',
+// 	MKV = '.mkv',
+// 	FLV = '.flv',
+// 	WEBM = '.webM',
+// }
+//
+// interface Media {
+// 	name: string,
+// 	type: TypesOfMedia,
+// 	format: FormatsOfMedia,
+// 	subtitles?: string,
+// 	marks?: unknown,
+// }
+//
+// function playMedia(
+// 	{name, type, format, subtitles, marks}: Media = {
+// 		name: "example",
+// 		type: TypesOfMedia.VIDEO,
+// 		format: FormatsOfMedia.MP4,
+// 	}
+// ): string {
+// 	let marksLog: unknown;
+//
+// 	if (Array.isArray(marks)) {
+// 		marksLog = marks.join(" ");
+// 	} else if (typeof marksLog === 'string') {
+// 		marksLog = marks;
+// 	} else {
+// 		marksLog = "Unsupported type of marks";
+// 	}
+//
+// 	console.log(`Media ${name}${format} is ${type}
+//     Marks: ${marksLog}
+//     Subtitles: ${subtitles ?? "none"}`);
+//
+// 	return "Media started";
+// }
+//
+// playMedia({
+// 	name: "WoW",
+// 	format: FormatsOfMedia.MKV,
+// 	type: TypesOfMedia.VIDEO,
+// 	subtitles: "hmhmhm hmhmhm doh",
+// 	marks: ["4:30", "5:40"],
+// });
+
+// #3
+type Animal = "cat" | "dog" | "bird";
+
+// Можно и не создавать перечисление, но вдруг в будущем статусов будет больше?
+
+enum AnimalStatus {
+	Available = "available",
+	NotAvailable = "not available",
 }
 
-enum FormatsOfMedia {
-	MP4 = '.mp4',
-	MOV = '.mov',
-	MKV = '.mkv',
-	FLV = '.flv',
-	WEBM = '.webM',
+interface AnimalData {
+	animal: Animal;
+	breed: string;
+	sterilized?: string;
 }
 
-interface Media {
-	name: string,
-	type: TypesOfMedia,
-	format: FormatsOfMedia,
-	subtitles?: string,
-	marks?: unknown,
+// Не повторяем код, используем extends
+interface AnimalAvailableData extends AnimalData {
+	location: string;
+	age?: number;
 }
 
-function playMedia(
-	{name, type, format, subtitles, marks}: Media = {
-		name: "example",
-		type: TypesOfMedia.VIDEO,
-		format: FormatsOfMedia.MP4,
-	}
-): string {
-	let marksLog: unknown;
+interface AnimalNotAvailableData {
+	message: string;
+	nextUpdateIn: Date;
+}
 
-	if (Array.isArray(marks)) {
-		marksLog = marks.join(" ");
-	} else if (typeof marksLog === 'string') {
-		marksLog = marks;
+// Интерфейсы стоит разделить, так как оба ответа будут иметь поле data
+// И только по статусу будет сложно определить данные
+
+interface AnimalAvailableResponse {
+	status: AnimalStatus.Available;
+	data: AnimalAvailableData;
+}
+
+interface AnimalNotAvailableResponse {
+	status: AnimalStatus.NotAvailable;
+	data: AnimalNotAvailableData;
+}
+
+type Res = AnimalAvailableResponse | AnimalNotAvailableResponse;
+
+function isAvailable(res: Res): res is AnimalAvailableResponse {
+	return res.status === AnimalStatus.Available;
+}
+
+function checkAnimalData(animal: Res): AnimalAvailableData | string {
+	if (isAvailable(animal)) {
+		return animal.data;
 	} else {
-		marksLog = "Unsupported type of marks";
+		return `${animal.data.message}, you can try in ${animal.data.nextUpdateIn}`;
 	}
-
-	console.log(`Media ${name}${format} is ${type}
-    Marks: ${marksLog}
-    Subtitles: ${subtitles ?? "none"}`);
-
-	return "Media started";
 }
-
-playMedia({
-	name: "WoW",
-	format: FormatsOfMedia.MKV,
-	type: TypesOfMedia.VIDEO,
-	subtitles: "hmhmhm hmhmhm doh",
-	marks: ["4:30", "5:40"],
-});
-
