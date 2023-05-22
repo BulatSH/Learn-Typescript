@@ -69,3 +69,29 @@ class Example {
 }
 
 type T0 = ConstructorParameters<typeof Example>
+
+// Awaited - формирует тип, который возвращает промис
+type FromPromise = Awaited<Promise<number>>; // number
+
+interface User {
+	name: string;
+}
+
+// Возвращает промис с пользователями
+async function fetchUsers(): Promise<User[]> {
+	return [
+		{
+			name: 'Alex',
+		}
+	];
+}
+
+const user = fetchUsers(); // Promise<User[]>
+
+type FetchUsersReturnType = Awaited<ReturnType<typeof fetchUsers>>; // User[]
+
+// Есть и другой вариант, он использовался до 4.5 версии Ts
+// infer - вытаскивает значение типа
+type UnwrappedPromise<T> = T extends Promise<infer Return> ? Return : T;
+
+type FetchDataReturnType = UnwrappedPromise<ReturnType<typeof fetchUsers>> // User[]
